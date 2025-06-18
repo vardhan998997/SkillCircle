@@ -7,18 +7,93 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Editor directories and files
-.vscode/*
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+build/
+dist-ssr/
+
+# Next.js / Nuxt
+.next/
+.nuxt/
+
+# Local env files
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor-specific files
+.vscode/
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.DS_Store
+
+# OS system files
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# TypeScript
+*.tsbuildinfo
+
+# Optional: test coverage
+coverage/
+
+# Optional: logs folder
+log/
+
+# Optional: temp folders
+tmp/
+temp/
+
+# Optional: React Native/Expo
+.expo/
+.expo-shared/
+
+# Optional: Firebase cache
+.firebase/
+.firebaserc
+
+# Optional: Storybook
+out/
+.storybook-out/
+
+# Optional: PM2 logs
+pids/
+*.pid
+
+# Optional: Docker
+docker-compose.override.yml
+Dockerfile.local
+
+# Optional: JetBrains IDEs
+*.iml
+.idea/
+
+# Optional: Local SQLite DBs
+*.sqlite
+*.db
+
+# Optional: Local backups
+*.bak
+*.old
+
+# Optional: Yarn Plug'n'Play
+.pnp.*
