@@ -26,7 +26,7 @@ dist-ssr/
 .nuxt/
 
 # Local env files
-.env
+/server/.env
 .env.*.local
 .env.local
 .env.development.local
