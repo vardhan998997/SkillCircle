@@ -2,6 +2,8 @@ import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import ChatbotHistory from '../models/ChatbotHistory.js';
 import { protect } from '../middleware/auth.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const router = express.Router();
 
@@ -17,28 +19,29 @@ if (process.env.GEMINI_API_KEY) {
 router.post('/ask', protect, async (req, res) => {
   try {
     const { question, topic = 'general' } = req.body;
+    console.log(question);
 
     if (!genAI) {
-      return res.status(503).json({ 
+      return res.status(503).json({
         message: 'AI service not available. Please add GEMINI_API_KEY to environment variables.',
-        answer: 'I apologize, but the AI service is currently unavailable. Please ensure the Gemini API key is properly configured.'
+        answer: 'AI service currently unavailable. Please check server configuration.'
       });
     }
 
-    // Get the generative model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
+    const chat = model.startChat(); // for conversation-like context
 
-    // Create a educational context prompt
     const prompt = `You are an educational assistant for SkillCircle, a learning platform. 
-    Please provide a helpful, clear, and educational answer to the following question about ${topic}:
-    
-    Question: ${question}
-    
-    Please provide a comprehensive but concise answer that would help a student learn.`;
+Please provide a helpful, clear, and educational answer to the following question about ${topic}:
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
+Question: ${question}
+
+Please provide a comprehensive but concise answer that would help a student learn.`;
+
+    const result = await chat.sendMessage(prompt);
+    const response = result.response;
     const answer = response.text();
+    console.log(answer);
 
     // Save to chat history
     const chatHistory = await ChatbotHistory.create({
@@ -57,11 +60,10 @@ router.post('/ask', protect, async (req, res) => {
 
   } catch (error) {
     console.error('Chatbot error:', error);
-    
-    // Provide fallback response
+
     const fallbackAnswer = `I'm having trouble processing your question right now. However, I'd suggest breaking down your question about "${req.body.question}" into smaller parts and trying to research each component. You might also want to ask this question in one of the study circles on our platform where other learners can help!`;
-    
-    // Still save to history with fallback
+
+    // Try to save fallback in DB
     try {
       await ChatbotHistory.create({
         user: req.user._id,
@@ -81,6 +83,7 @@ router.post('/ask', protect, async (req, res) => {
     });
   }
 });
+
 
 // Get user's chat history
 router.get('/history', protect, async (req, res) => {
