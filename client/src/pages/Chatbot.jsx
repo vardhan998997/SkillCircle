@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import API from '../api'; // ✅ Using shared axios instance
 import toast from 'react-hot-toast';
 import { 
   Bot, 
@@ -36,7 +36,7 @@ const Chatbot = () => {
 
   const fetchHistory = async () => {
     try {
-      const response = await axios.get('/api/chatbot/history?limit=50');
+      const response = await API.get('/api/chatbot/history?limit=50');
       setHistory(response.data.history);
     } catch (error) {
       console.error('Fetch history error:', error);
@@ -52,7 +52,6 @@ const Chatbot = () => {
     setNewQuestion('');
     setLoading(true);
 
-    // Add user message to chat
     const userMessage = {
       id: Date.now(),
       type: 'user',
@@ -62,12 +61,11 @@ const Chatbot = () => {
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      const response = await axios.post('/api/chatbot/ask', {
+      const response = await API.post('/api/chatbot/ask', {
         question,
         topic: selectedTopic
       });
 
-      // Add AI response to chat
       const aiMessage = {
         id: Date.now() + 1,
         type: 'ai',
@@ -75,14 +73,11 @@ const Chatbot = () => {
         timestamp: new Date(response.data.timestamp)
       };
       setMessages(prev => [...prev, aiMessage]);
-
-      // Refresh history
       fetchHistory();
     } catch (error) {
       console.error('Ask question error:', error);
       toast.error('Failed to get response from AI assistant');
-      
-      // Add error message
+
       const errorMessage = {
         id: Date.now() + 1,
         type: 'ai',
@@ -106,7 +101,7 @@ const Chatbot = () => {
       content: historyItem.question,
       timestamp: new Date(historyItem.createdAt)
     };
-    
+
     const aiMessage = {
       id: Date.now() + 1,
       type: 'ai',
@@ -119,7 +114,7 @@ const Chatbot = () => {
 
   const deleteHistoryItem = async (id) => {
     try {
-      await axios.delete(`/api/chatbot/history/${id}`);
+      await API.delete(`/api/chatbot/history/${id}`);
       setHistory(prev => prev.filter(item => item._id !== id));
       toast.success('History item deleted');
     } catch (error) {

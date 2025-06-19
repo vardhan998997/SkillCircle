@@ -14,6 +14,7 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
+import API from '../api';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -26,7 +27,7 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await axios.get('/api/users/dashboard');
+      const response = await API.get('/api/users/dashboard');
       setDashboardData(response.data);
     } catch (error) {
       console.error('Dashboard fetch error:', error);

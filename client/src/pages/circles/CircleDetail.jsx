@@ -15,6 +15,7 @@ import {
   UserMinus,
   AlertCircle
 } from 'lucide-react';
+import API from '../../api';
 
 const CircleDetail = () => {
   const { id } = useParams();
@@ -29,7 +30,7 @@ const CircleDetail = () => {
 
   const fetchCircle = async () => {
     try {
-      const response = await axios.get(`/api/circles/${id}`);
+      const response = await API.get(`/api/circles/${id}`);
       setCircle(response.data);
     } catch (error) {
       console.error('Fetch circle error:', error);
@@ -42,7 +43,7 @@ const CircleDetail = () => {
 
   const handleJoinCircle = async () => {
     try {
-      await axios.post(`/api/circles/${id}/join`);
+      await API.post(`/api/circles/${id}/join`);
       toast.success('Successfully joined the study circle!');
       fetchCircle(); // Refresh circle data
     } catch (error) {
@@ -57,7 +58,7 @@ const CircleDetail = () => {
     }
 
     try {
-      await axios.post(`/api/circles/${id}/leave`);
+      await API.post(`/api/circles/${id}/leave`);
       toast.success('Left the study circle');
       fetchCircle(); // Refresh circle data
     } catch (error) {

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import API from '../api';
 
 const AuthContext = createContext();
 
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.get('/api/auth/profile');
+      const response = await API.get('/api/auth/profile');
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
@@ -81,7 +82,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await API.post('/api/auth/login', { email, password });
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {
@@ -100,7 +101,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/register', userData);
+      const response = await API.post('/api/auth/register', userData);
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: {

@@ -50,7 +50,7 @@ const CreateCircle = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/circles', formData);
+      const response = await API.post('/api/circles', formData);
       toast.success('Study circle created successfully!');
       navigate(`/circles/${response.data._id}`);
     } catch (error) {

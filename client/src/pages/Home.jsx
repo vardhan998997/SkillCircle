@@ -94,7 +94,7 @@ const Home = () => {
                   <Link
                     to="/courses"
                     className="inline-flex items-center px-8 py-4 bg-white hover:bg-gray-50 text-primary-600 border-2 border-primary-600 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                  >
+                  > 
                     Explore Platform
                   </Link>
                 </>

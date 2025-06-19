@@ -13,13 +13,18 @@ dotenv.config();
   
 const app = express();
 const PORT = process.env.PORT || 5000; 
-
+ 
 // Connect to MongoDB
 connectDB();
 
 // Middleware
-app.use(cors());
 app.use(express.json());
+
+
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://skill-circle-eta.vercel.app'], 
+  credentials: true // if using cookies or auth headers
+}));
 
 // Routes
 app.use('/api/auth', authRoutes);

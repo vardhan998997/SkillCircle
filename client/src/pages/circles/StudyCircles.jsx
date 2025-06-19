@@ -12,6 +12,7 @@ import {
   Clock,
   Target
 } from 'lucide-react';
+import API from '../../api';
 
 const StudyCircles = () => {
   const { isAuthenticated, user } = useAuth();
@@ -34,7 +35,7 @@ const StudyCircles = () => {
         if (filters[key]) params.append(key, filters[key]);
       });
 
-      const response = await axios.get(`/api/circles?${params}`);
+      const response = await API.get(`/api/circles?${params}`);
       setCircles(response.data);
     } catch (error) {
       console.error('Fetch circles error:', error);
@@ -58,7 +59,7 @@ const StudyCircles = () => {
     }
 
     try {
-      await axios.post(`/api/circles/${circleId}/join`);
+      await API.post(`/api/circles/${circleId}/join`);
       toast.success('Successfully joined the study circle!');
       fetchCircles(); // Refresh the list
     } catch (error) {

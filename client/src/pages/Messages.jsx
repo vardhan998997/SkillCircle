@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { MessageSquare, Send, Search } from 'lucide-react';
+import API from '../api';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -31,7 +32,7 @@ const Messages = () => {
 
   const fetchConversations = async () => {
     try {
-      const response = await axios.get('/api/messages/conversations');
+      const response = await API.get('/api/messages/conversations');
       setConversations(response.data);
     } catch (error) {
       console.error('Fetch conversations error:', error);
@@ -42,7 +43,7 @@ const Messages = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/users');
+      const response = await API.get('/api/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Fetch users error:', error);
@@ -51,7 +52,7 @@ const Messages = () => {
 
   const startConversationWithUser = async (userId) => {
     try {
-      const response = await axios.get(`/api/messages/direct/${userId}`);
+      const response = await API.get(`/api/messages/direct/${userId}`);
       const userData = users.find(u => u._id === userId) || { _id: userId, name: 'Unknown User', email: '' };
 
       setSelectedConversation({ type: 'direct', user: userData, messages: response.data });
@@ -63,7 +64,7 @@ const Messages = () => {
 
   const loadCircleMessages = async (circleId) => {
     try {
-      const response = await axios.get(`/api/messages/group/${circleId}`);
+      const response = await API.get(`/api/messages/group/${circleId}`);
       setSelectedConversation({ type: 'group', circleId, messages: response.data });
       setMessages(response.data);
     } catch (error) {
@@ -76,14 +77,14 @@ const Messages = () => {
     if (!userId) return;
 
     try {
-      const response = await axios.get(`/api/messages/direct/${userId}`);
+      const response = await API.get(`/api/messages/direct/${userId}`);
       setSelectedConversation({
         type: 'direct',
         user: conversation._id,
         messages: response.data,
       });
       setMessages(response.data);
-      await axios.put(`/api/messages/read/${userId}`);
+      await API.put(`/api/messages/read/${userId}`);
     } catch (error) {
       console.error('Select conversation error:', error);
     }
@@ -97,12 +98,12 @@ const Messages = () => {
     try {
       let response;
       if (selectedConversation.type === 'direct') {
-        response = await axios.post('/api/messages/direct', {
+        response = await API.post('/api/messages/direct', {
           receiver: selectedConversation.user._id,
           content: trimmed,
         });
       } else {
-        response = await axios.post('/api/messages/group', {
+        response = await API.post('/api/messages/group', {
           studyCircle: selectedConversation.circleId,
           content: trimmed,
         });

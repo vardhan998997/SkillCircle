@@ -15,6 +15,7 @@ import {
   Plus,
   Trash2
 } from 'lucide-react';
+import API from '../api';
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
@@ -36,7 +37,7 @@ const Profile = () => {
 
   const fetchUserStats = async () => {
     try {
-      const response = await axios.get('/api/users/dashboard');
+      const response = await API.get('/api/users/dashboard');
       setStats(response.data.stats);
     } catch (error) {
       console.error('Fetch stats error:', error);
@@ -89,7 +90,7 @@ const Profile = () => {
     setLoading(true);
     
     try {
-      const response = await axios.put('/api/users/profile', profileData);
+      const response = await API.put('/api/users/profile', profileData);
       updateUser(response.data);
       setEditing(false);
       toast.success('Profile updated successfully!');

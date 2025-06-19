@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import API from '../../api';
 import toast from 'react-hot-toast';
 import { 
   BookOpen, 
@@ -33,7 +33,7 @@ const CourseDetail = () => {
 
   const fetchCourse = async () => {
     try {
-      const response = await axios.get(`/api/courses/${id}`);
+      const response = await API.get(`/api/courses/${id}`);
       setCourse(response.data);
     } catch (error) {
       console.error('Fetch course error:', error);
@@ -53,7 +53,7 @@ const CourseDetail = () => {
     }
 
     try {
-      await axios.post(`/api/courses/${id}/request`, requestData);
+      await API.post(`/api/courses/${id}/request`, requestData);
       toast.success('Access request sent successfully!');
       setShowRequestModal(false);
       setRequestData({ reason: '', timeWindow: '' });
@@ -62,31 +62,6 @@ const CourseDetail = () => {
       toast.error(error.response?.data?.message || 'Failed to send request');
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading course details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!course) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle size={64} className="mx-auto text-gray-400 mb-4" />
-          <h3 className="text-xl font-medium text-gray-900 mb-2">Course not found</h3>
-          <Link to="/courses" className="text-primary-600 hover:text-primary-700">
-            Back to courses
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   const isOwner = user?._id === course.owner?._id;
 

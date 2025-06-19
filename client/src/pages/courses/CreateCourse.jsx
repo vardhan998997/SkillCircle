@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { BookOpen, Upload, ArrowLeft } from 'lucide-react';
+import API from '../../api';
 
 const CreateCourse = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const CreateCourse = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/courses', formData);
+      const response = await API.post('/api/courses', formData);
       toast.success('Course shared successfully!');
       navigate(`/courses/${response.data._id}`);
     } catch (error) {
@@ -42,6 +43,7 @@ const CreateCourse = () => {
     } finally {
       setLoading(false);
     }
+
   };
 
   return (

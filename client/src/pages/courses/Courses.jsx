@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import API from '../../api';
 import { 
   BookOpen, 
   Search, 
@@ -36,7 +37,7 @@ const Courses = () => {
         if (filters[key]) params.append(key, filters[key]);
       });
 
-      const response = await axios.get(`/api/courses?${params}`);
+      const response = await API.get(`/api/courses?${params}`);
       setCourses(response.data);
     } catch (error) {
       console.error('Fetch courses error:', error);
