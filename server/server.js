@@ -29,7 +29,7 @@ app.use(express.json());
 // -------------------------
 const allowedOrigins = [
   'http://localhost:3000', // local frontend
-  'https://skill-circle-hn8rj860v-vishnu3.vercel.app/' // deployed Vercel frontend
+  'https://skill-circle-hn8rj860v-vishnu3.vercel.app' // deployed Vercel frontend
 ];
 
 app.use(cors({
