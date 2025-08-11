@@ -43,10 +43,10 @@ const Home = () => {
   ];
 
   const stats = [
-    { number: '1,000+', label: 'Active Learners' },
-    { number: '500+', label: 'Courses Shared' },
-    { number: '200+', label: 'Study Circles' },
-    { number: '10,000+', label: 'Questions Answered' }
+    { number: '10+', label: 'Active Learners' },
+    { number: '5+', label: 'Courses Shared' },
+    { number: '20+', label: 'Study Circles' },
+    { number: '100+', label: 'Questions Answered' }
   ];
 
   return (
