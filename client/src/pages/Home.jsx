@@ -43,10 +43,10 @@ const Home = () => {
   ];
 
   const stats = [
-    { number: '1,000+', label: 'Active Learners' },
-    { number: '500+', label: 'Courses Shared' },
-    { number: '200+', label: 'Study Circles' },
-    { number: '10,000+', label: 'Questions Answered' }
+    { number: '30+', label: 'Active Learners' },
+    { number: '5+', label: 'Courses Shared' },
+    { number: '10+', label: 'Study Circles' },
+    { number: '100+', label: 'Questions Answered' }
   ];
 
   return (
@@ -209,7 +209,7 @@ const Home = () => {
             Ready to Transform Your Learning Journey?
           </h2>
           <p className="text-xl text-primary-100 mb-8">
-            Join thousands of learners who are already growing together on SkillCircle.
+            Some learners who are already growing together on SkillCircle.
           </p>
           
           {!isAuthenticated && (

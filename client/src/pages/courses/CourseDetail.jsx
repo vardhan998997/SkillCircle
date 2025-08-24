@@ -11,8 +11,7 @@ import {
   Tag, 
   ArrowLeft,
   MessageSquare,
-  Calendar,
-  AlertCircle
+  Calendar
 } from 'lucide-react';
 
 const CourseDetail = () => {
@@ -46,12 +45,10 @@ const CourseDetail = () => {
 
   const handleRequestAccess = async (e) => {
     e.preventDefault();
-    
     if (!requestData.reason.trim() || !requestData.timeWindow.trim()) {
       toast.error('Please fill in all fields');
       return;
     }
-
     try {
       await API.post(`/api/courses/${id}/request`, requestData);
       toast.success('Access request sent successfully!');
@@ -62,6 +59,14 @@ const CourseDetail = () => {
       toast.error(error.response?.data?.message || 'Failed to send request');
     }
   };
+
+  if (loading) {
+    return <div className="text-center mt-20">Loading course details...</div>;
+  }
+
+  if (!course) {
+    return <div className="text-center mt-20">Course not found</div>;
+  }
 
   const isOwner = user?._id === course.owner?._id;
 
@@ -80,11 +85,13 @@ const CourseDetail = () => {
         <div className="card p-8">
           {/* Course Header */}
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
-            <img
-              src={course.imageURL}
-              alt={course.title}
-              className="w-full lg:w-80 h-64 object-cover rounded-lg"
-            />
+            {course.imageURL && (
+              <img
+                src={course.imageURL}
+                alt={course.title}
+                className="w-full lg:w-80 h-64 object-cover rounded-lg"
+              />
+            )}
             
             <div className="flex-1">
               <div className="flex items-start justify-between mb-4">
@@ -98,22 +105,24 @@ const CourseDetail = () => {
                 </div>
               </div>
 
-              <p className="text-gray-600 text-lg mb-6 leading-relaxed">
-                {course.description}
-              </p>
+              <p className="text-gray-600 text-lg mb-6 leading-relaxed">{course.description}</p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center text-gray-700">
-                  <ExternalLink size={20} className="mr-3 text-gray-400" />
-                  <span className="font-medium">Platform:</span>
-                  <span className="ml-2">{course.platform}</span>
-                </div>
-                
-                <div className="flex items-center text-gray-700">
-                  <Tag size={20} className="mr-3 text-gray-400" />
-                  <span className="font-medium">Category:</span>
-                  <span className="ml-2 capitalize">{course.category}</span>
-                </div>
+                {course.platform && (
+                  <div className="flex items-center text-gray-700">
+                    <ExternalLink size={20} className="mr-3 text-gray-400" />
+                    <span className="font-medium">Platform:</span>
+                    <span className="ml-2">{course.platform}</span>
+                  </div>
+                )}
+
+                {course.category && (
+                  <div className="flex items-center text-gray-700">
+                    <Tag size={20} className="mr-3 text-gray-400" />
+                    <span className="font-medium">Category:</span>
+                    <span className="ml-2 capitalize">{course.category}</span>
+                  </div>
+                )}
 
                 {course.duration && (
                   <div className="flex items-center text-gray-700">
@@ -123,67 +132,73 @@ const CourseDetail = () => {
                   </div>
                 )}
 
-                <div className="flex items-center text-gray-700">
-                  <BookOpen size={20} className="mr-3 text-gray-400" />
-                  <span className="font-medium">Level:</span>
-                  <span className="ml-2 capitalize">{course.difficulty}</span>
-                </div>
+                {course.difficulty && (
+                  <div className="flex items-center text-gray-700">
+                    <BookOpen size={20} className="mr-3 text-gray-400" />
+                    <span className="font-medium">Level:</span>
+                    <span className="ml-2 capitalize">{course.difficulty}</span>
+                  </div>
+                )}
               </div>
 
-              <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                course.availability === 'available' 
-                  ? 'bg-green-100 text-green-700'
-                  : course.availability === 'busy'
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}>
-                Status: {course.availability}
-              </div>
-            </div>
-          </div>
-
-          {/* Owner Info */}
-          <div className="border-t pt-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Owner</h3>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium">
-                    {course.owner?.name?.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div className="ml-4">
-                  <h4 className="font-medium text-gray-900">{course.owner?.name}</h4>
-                  <p className="text-sm text-gray-600 capitalize">{course.owner?.role}</p>
-                  {course.owner?.bio && (
-                    <p className="text-sm text-gray-600 mt-1">{course.owner.bio}</p>
-                  )}
-                </div>
-              </div>
-
-              {isAuthenticated && !isOwner && (
-                <div className="flex space-x-3">
-                  <Link
-                    to={`/messages?user=${course.owner._id}`}
-                    className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 hover:border-gray-400 rounded-lg transition-colors duration-200"
-                  >
-                    <MessageSquare size={16} className="mr-2" />
-                    Message
-                  </Link>
-                  
-                  {course.availability === 'available' && (
-                    <button
-                      onClick={() => setShowRequestModal(true)}
-                      className="flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200"
-                    >
-                      <Calendar size={16} className="mr-2" />
-                      Request Access
-                    </button>
-                  )}
+              {course.availability && (
+                <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                  course.availability === 'available' 
+                    ? 'bg-green-100 text-green-700'
+                    : course.availability === 'busy'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-gray-100 text-gray-700'
+                }`}>
+                  Status: {course.availability}
                 </div>
               )}
             </div>
           </div>
+
+          {/* Owner Info */}
+          {course.owner && (
+            <div className="border-t pt-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Owner</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-medium">
+                      {course.owner?.name?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="font-medium text-gray-900">{course.owner?.name}</h4>
+                    <p className="text-sm text-gray-600 capitalize">{course.owner?.role}</p>
+                    {course.owner?.bio && (
+                      <p className="text-sm text-gray-600 mt-1">{course.owner.bio}</p>
+                    )}
+                  </div>
+                </div>
+
+                {isAuthenticated && !isOwner && (
+                  <div className="flex space-x-3">
+                    <Link
+                      to={`/messages?user=${course.owner._id}`}
+                      className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 hover:border-gray-400 rounded-lg transition-colors duration-200"
+                    >
+                      <MessageSquare size={16} className="mr-2" />
+                      Message
+                    </Link>
+                    
+                    {course.availability === 'available' && (
+                      <button
+                        onClick={() => setShowRequestModal(true)}
+                        className="flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200"
+                      >
+                        <Calendar size={16} className="mr-2" />
+                        Request Access
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Request Access Modal */}

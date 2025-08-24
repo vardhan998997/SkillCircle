@@ -103,7 +103,7 @@ router.post('/:id/join', protect, async (req, res) => {
 
     res.json(updatedCircle);
   } catch (error) {
-    console.error('Join circle error:', error);
+    // console.error('Join circle error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }) => {
   // Set axios defaults on app load
   useEffect(() => {
     if (state.token) {
+      console.log(state)
       axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
       loadUser();
     } else {

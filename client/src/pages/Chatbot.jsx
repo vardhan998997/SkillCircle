@@ -22,10 +22,12 @@ const Chatbot = () => {
   const [selectedTopic, setSelectedTopic] = useState('general');
   const messagesEndRef = useRef(null);
 
+  // ✅ Fetch history when component mounts
   useEffect(() => {
     fetchHistory();
   }, []);
 
+  // ✅ Auto-scroll when messages update
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -34,15 +36,18 @@ const Chatbot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // ✅ Fetch chat history
   const fetchHistory = async () => {
     try {
       const response = await API.get('/api/chatbot/history?limit=50');
-      setHistory(response.data.history);
+      setHistory(response.data.history || []);
     } catch (error) {
       console.error('Fetch history error:', error);
+      toast.error('Failed to fetch chat history');
     }
   };
 
+  // ✅ Ask a new question
   const askQuestion = async (e) => {
     e.preventDefault();
     
@@ -70,7 +75,7 @@ const Chatbot = () => {
         id: Date.now() + 1,
         type: 'ai',
         content: response.data.answer,
-        timestamp: new Date(response.data.timestamp)
+        timestamp: new Date(response.data.timestamp || Date.now())
       };
       setMessages(prev => [...prev, aiMessage]);
       fetchHistory();
@@ -90,10 +95,12 @@ const Chatbot = () => {
     }
   };
 
+  // ✅ Clear current chat
   const clearChat = () => {
     setMessages([]);
   };
 
+  // ✅ Load a specific history item
   const loadHistoryItem = (historyItem) => {
     const userMessage = {
       id: Date.now(),
@@ -112,6 +119,7 @@ const Chatbot = () => {
     setMessages([userMessage, aiMessage]);
   };
 
+  // ✅ Delete a history item
   const deleteHistoryItem = async (id) => {
     try {
       await API.delete(`/api/chatbot/history/${id}`);
@@ -123,6 +131,7 @@ const Chatbot = () => {
     }
   };
 
+  // ✅ Suggested questions
   const suggestedQuestions = [
     "How do I get started with React?",
     "What's the difference between let, const, and var in JavaScript?",
@@ -130,6 +139,7 @@ const Chatbot = () => {
     "How do I improve my problem-solving skills?",
     "What are the best practices for learning a new programming language?"
   ];
+
 
   return (
     <div className="min-h-screen bg-gray-50">

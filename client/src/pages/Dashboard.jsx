@@ -28,10 +28,11 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const response = await API.get('/api/users/dashboard');
+      console.log(response)
       setDashboardData(response.data);
     } catch (error) {
       console.error('Dashboard fetch error:', error);
-      toast.error('Failed to load dashboard data');
+      // toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }

@@ -29,22 +29,34 @@ const CreateCourse = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const response = await API.post('/api/courses', formData);
-      toast.success('Course shared successfully!');
-      navigate(`/courses/${response.data._id}`);
-    } catch (error) {
-      console.error('Create course error:', error);
-      toast.error(error.response?.data?.message || 'Failed to create course');
-    } finally {
+  try {
+    const token = localStorage.getItem('token'); // get logged-in token
+    if (!token) {
+      toast.error('Please login to create a course');
       setLoading(false);
+      return;
     }
 
-  };
+    const response = await API.post('/api/courses', formData, {
+      headers: {
+        Authorization: `Bearer ${token}` // ✅ send token in header
+      }
+    });
+
+    toast.success('Course shared successfully!');
+    navigate(`/courses/${response.data._id}`);
+  } catch (error) {
+    console.error('Create course error:', error.response?.data || error.message);
+    toast.error(error.response?.data?.message || 'Failed to create course');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

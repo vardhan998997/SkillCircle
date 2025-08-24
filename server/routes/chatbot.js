@@ -3,47 +3,58 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import ChatbotHistory from '../models/ChatbotHistory.js';
 import { protect } from '../middleware/auth.js';
 import dotenv from 'dotenv';
-dotenv.config();
 
+dotenv.config();
 const router = express.Router();
 
-// Initialize Gemini AI
-let genAI;
+// ✅ Initialize Gemini AI safely
+let genAI = null;
 if (process.env.GEMINI_API_KEY) {
   genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 } else {
   console.log('⚠️ GEMINI_API_KEY not found in environment variables');
 }
 
+// ----------------------
 // Ask question to chatbot
-router.post('/ask', protect, async (req, res) => {
+// ----------------------
+router.post("/ask", protect, async (req, res) => {
   try {
-    const { question, topic = 'general' } = req.body;
-    console.log(question);
+    const { question, topic = "general" } = req.body;
+
+    if (!question || !question.trim()) {
+      return res.status(400).json({ message: "Question is required" });
+    }
 
     if (!genAI) {
       return res.status(503).json({
-        message: 'AI service not available. Please add GEMINI_API_KEY to environment variables.',
-        answer: 'AI service currently unavailable. Please check server configuration.'
+        message: "AI service not available. Please add GEMINI_API_KEY to environment variables.",
+        answer: "AI service currently unavailable. Please check server configuration."
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
-    const chat = model.startChat(); // for conversation-like context
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `You are an educational assistant for SkillCircle, a learning platform. 
+    const prompt = `You are an educational assistant for SkillCircle.
 Please provide a helpful, clear, and educational answer to the following question about ${topic}:
 
 Question: ${question}
 
 Please provide a comprehensive but concise answer that would help a student learn.`;
 
-    const result = await chat.sendMessage(prompt);
-    const response = result.response;
-    const answer = response.text();
-    console.log(answer);
+    const result = await model.generateContent(prompt);
 
-    // Save to chat history
+    // ✅ Handle SDK variations (sometimes response shape differs)
+    let answer = "";
+    try {
+      answer = result.response.text();
+    } catch {
+      answer =
+        result.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "Sorry, I couldn’t generate an answer this time.";
+    }
+
+    // ✅ Save to chat history
     const chatHistory = await ChatbotHistory.create({
       user: req.user._id,
       question,
@@ -59,33 +70,33 @@ Please provide a comprehensive but concise answer that would help a student lear
     });
 
   } catch (error) {
-    console.error('Chatbot error:', error);
+    console.error("Chatbot error:", error);
 
     const fallbackAnswer = `I'm having trouble processing your question right now. However, I'd suggest breaking down your question about "${req.body.question}" into smaller parts and trying to research each component. You might also want to ask this question in one of the study circles on our platform where other learners can help!`;
 
-    // Try to save fallback in DB
     try {
       await ChatbotHistory.create({
         user: req.user._id,
         question: req.body.question,
         answer: fallbackAnswer,
-        topic: req.body.topic || 'general'
+        topic: req.body.topic || "general"
       });
     } catch (historyError) {
-      console.error('History save error:', historyError);
+      console.error("History save error:", historyError);
     }
 
     res.json({
       question: req.body.question,
       answer: fallbackAnswer,
-      topic: req.body.topic || 'general',
+      topic: req.body.topic || "general",
       timestamp: new Date()
     });
   }
 });
 
-
+// ----------------------
 // Get user's chat history
+// ----------------------
 router.get('/history', protect, async (req, res) => {
   try {
     const { page = 1, limit = 20, topic } = req.query;
@@ -97,16 +108,16 @@ router.get('/history', protect, async (req, res) => {
 
     const history = await ChatbotHistory.find(query)
       .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+      .limit(Number(limit))
+      .skip((Number(page) - 1) * Number(limit));
 
     const total = await ChatbotHistory.countDocuments(query);
 
     res.json({
       history,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: Number(page),
+        limit: Number(limit),
         total,
         pages: Math.ceil(total / limit)
       }
@@ -117,7 +128,9 @@ router.get('/history', protect, async (req, res) => {
   }
 });
 
+// ----------------------
 // Delete chat history item
+// ----------------------
 router.delete('/history/:id', protect, async (req, res) => {
   try {
     const historyItem = await ChatbotHistory.findById(req.params.id);
@@ -138,7 +151,9 @@ router.delete('/history/:id', protect, async (req, res) => {
   }
 });
 
+// ----------------------
 // Get chat topics
+// ----------------------
 router.get('/topics', protect, async (req, res) => {
   try {
     const topics = await ChatbotHistory.distinct('topic', { user: req.user._id });

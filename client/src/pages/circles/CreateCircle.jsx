@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Users, Plus, ArrowLeft, X } from 'lucide-react';
+import API from "../../api";  
 
 const CreateCircle = () => {
   const navigate = useNavigate();
@@ -45,21 +46,31 @@ const CreateCircle = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const response = await API.post('/api/circles', formData);
-      toast.success('Study circle created successfully!');
-      navigate(`/circles/${response.data._id}`);
-    } catch (error) {
-      console.error('Create circle error:', error);
-      toast.error(error.response?.data?.message || 'Failed to create study circle');
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const response = await API.post(
+      '/api/circles',
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${user?.token}` // ✅ add token
+        }
+      }
+    );
+
+    toast.success('Study circle created successfully!');
+    navigate(`/circles/${response.data._id}`);
+  } catch (error) {
+    console.error('Create circle error:', error.response?.data || error.message);
+    toast.error(error.response?.data?.message || 'Failed to create study circle');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -274,3 +285,4 @@ const CreateCircle = () => {
 };
 
 export default CreateCircle;
+
